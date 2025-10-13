@@ -1,0 +1,10 @@
+name = "compiler"
+version = "0.1.0"
+defaultTargets = ["compiler"]
+
+[[lean_lib]]
+name = "Compiler"
+
+[[lean_exe]]
+name = "compiler"
+root = "Main"
