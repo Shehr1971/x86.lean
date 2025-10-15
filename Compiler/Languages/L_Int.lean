@@ -60,5 +60,3 @@ unsafe def L_Int_Expr.eval_str (s : String) : IO Int :=
   match parse_expr s.iter with
   | .success _ res => eval_expr res
   | .error _ _ => MonadExceptOf.throw $ IO.userError "Couldn't Parse String"
-
-

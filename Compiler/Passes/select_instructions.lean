@@ -46,7 +46,7 @@ def x86_Var.from_C_Var : C_Var.Program → Program
         -- silly, but don't optimize prematurely
         
     } 
-    (tails.map $ fun (.label l,t) => (.label l, select_instructions.block t))
+    (tails.map $ fun (l,t) => (l, select_instructions.block t))
 
 #eval match L_Var.Expr.parse_expr "(+ (read) (- 1 1))".iter with
   | .success _ expr => Option.some 

@@ -31,7 +31,7 @@ def L_Var.Sym.parse_sym : Parsec String.Iterator Sym := do
   pure $ .quote ⟨ char_array.toList ⟩
 
 def L_Var.Expr.parse_var : Parsec String.Iterator Expr :=
-  Sym.parse_sym >>= pure ∘ .var
+  .var <$> Sym.parse_sym 
 
 def L_Var.Expr.parse_atom := parse_var <|> parse_int
 

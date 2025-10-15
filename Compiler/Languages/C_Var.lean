@@ -1,9 +1,6 @@
 import Compiler.Data.Sym
+import Compiler.Data.Label
 import Lean.Data
-
-inductive C_Var.Label where
-  | label : String → Label
-  deriving Repr
 
 inductive C_Var.Atom where
   | var : Sym → Atom

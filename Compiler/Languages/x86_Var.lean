@@ -1,13 +1,7 @@
 import Compiler.Data.Sym
+import Compiler.Data.Label
 import Compiler.Data.Reg
 import Lean.Data
-
-inductive x86_Var.Label
-| label : String → Label
-
-instance instToStringLabel_x86_Var : ToString x86_Var.Label where
-  toString : x86_Var.Label → String
-  | .label s => s
 
 inductive x86_Var.Arg
 | imm : Int → Arg
@@ -50,7 +44,8 @@ inductive x86_Var.Block
 
 instance instToStringBlock_x86_Var : ToString x86_Var.Block where
   toString : x86_Var.Block → String
-  | .block instrs => String.join $ instrs.map (fun instr => s!"\t{toString instr}\n")
+  | .block instrs => String.join 
+  $ instrs.map $ fun instr => s!"\t{toString instr}\n"
 
 structure x86_Var.Info where
   locals_types : Lean.AssocList Sym Sym
@@ -61,4 +56,5 @@ inductive x86_Var.Program
 
 instance instToStringProgram_x86_Var : ToString x86_Var.Program where
   toString : x86_Var.Program → String
-  | .program _ lblocks => "\n".intercalate $ lblocks.map (fun (label, block) => s!"{label}:\n{block}")
+  | .program _ lblocks => "\n".intercalate 
+  $ lblocks.map $ fun (label, block) => s!"{label}:\n{block}"
