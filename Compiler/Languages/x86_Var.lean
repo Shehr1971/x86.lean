@@ -39,20 +39,23 @@ instance instToStringInstr_x86_Var : ToString x86_Var.Instr where
   | .jmp l => s!"jmp {l}"
   | .retq => "retq"
 
+structure x86_Var.BInfo where
+  live_before : Option (List (List (Sym⊕ Reg)))
+
 inductive x86_Var.Block
-| block: List Instr → Block
+| block: BInfo → List Instr → Block
 
 instance instToStringBlock_x86_Var : ToString x86_Var.Block where
   toString : x86_Var.Block → String
-  | .block instrs => String.join 
+  | .block _ instrs => String.join 
   $ instrs.map $ fun instr => s!"\t{toString instr}\n"
 
-structure x86_Var.Info where
+structure x86_Var.PInfo where
   locals_types : Lean.AssocList Sym Sym
   stack_space : Nat
 
 inductive x86_Var.Program
-| program: Info → List (Label × Block) → Program
+| program: PInfo → List (Label × Block) → Program
 
 instance instToStringProgram_x86_Var : ToString x86_Var.Program where
   toString : x86_Var.Program → String

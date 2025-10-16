@@ -34,7 +34,7 @@ def x86_Var.select_instructions.tail : C_Var.Tail → List Instr
 | .ret (.negative a) => let rax := .reg .rax; [.movq (atom a) rax, .negq rax, .jmp (.label "fini")]
 | .ret (.atom a) => [.movq (atom a) (.reg .rax), .jmp (.label "fini")]
 
-def x86_Var.select_instructions.block (c_instrs : C_Var.Tail) : Block := .block $ tail c_instrs
+def x86_Var.select_instructions.block (c_instrs : C_Var.Tail) : Block := .block { live_before := none } $ tail c_instrs
 
 def x86_Var.from_C_Var : C_Var.Program → Program
 | .program info tails => .program 

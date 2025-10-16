@@ -21,7 +21,7 @@ def x86_Var.Instr.assign_homes : Lean.AssocList Sym Nat → x86_Var.Instr → Op
 | _, .retq => pure $ .retq
 
 def x86_Var.Block.assign_homes : Lean.AssocList Sym Nat → x86_Var.Block → Option x86_Int.Block
-| l, .block instrs => .block <$> instrs.mapM (fun i => Instr.assign_homes l i)
+| l, .block _ instrs => .block <$> instrs.mapM (fun i => Instr.assign_homes l i)
 
 def x86_Var.Program.assign_homes : x86_Var.Program → Option x86_Int.Program
 | .program info blocks => .program 
@@ -30,7 +30,7 @@ def x86_Var.Program.assign_homes : x86_Var.Program → Option x86_Int.Program
 where 
 locations_for_locals : Lean.AssocList Sym Sym → Lean.AssocList Sym Nat
 | locals => (locals.toList.foldr (fun (v,_) (l,n)  => (l.insert v n, n+1)) (.nil, 1)).1
-redoBlock : Info → (Label × Block) → Option (Label×x86_Int.Block)
+redoBlock : PInfo → (Label × Block) → Option (Label×x86_Int.Block)
 | info, (l, b) => (.,.) <$> pure l <*> Block.assign_homes (locations_for_locals info.locals_types) b
 
 #eval match L_Var.Expr.parse_expr "(let 'x (read) (+ (- 'x 1) 'x))".iter with
