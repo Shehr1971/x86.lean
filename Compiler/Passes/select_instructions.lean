@@ -23,16 +23,16 @@ def x86_Var.select_instructions.stmt : C_Var.Stmt → List Instr
   if .var v == a then [.negq (.var v)]
   else [.movq (atom a) (.var v), .negq (.var v)]
 | .assign v .read =>
-  [.callq (.label "read_int") 0, .movq (.reg .rax) (.var v)]
+  [.callq ("read_int") 0, .movq (.reg .rax) (.var v)]
 | .assign v (.atom a) => [.movq (atom a) (.var v)]
 
 def x86_Var.select_instructions.tail : C_Var.Tail → List Instr
 | .seq assign rest => stmt assign ++ tail rest
-| .ret .read => [.callq (.label "read_int") 0, .jmp (.label "fini")]
-| .ret (.plus a b) => let rax := .reg .rax; [.movq (atom a) rax, .addq (atom b) rax, .jmp (.label "fini")]
-| .ret (.minus a b) => let rax := .reg .rax; [.movq (atom a) rax, .subq (atom b) rax, .jmp (.label "fini")]
-| .ret (.negative a) => let rax := .reg .rax; [.movq (atom a) rax, .negq rax, .jmp (.label "fini")]
-| .ret (.atom a) => [.movq (atom a) (.reg .rax), .jmp (.label "fini")]
+| .ret .read => [.callq "read_int" 0, .jmp "fini"]
+| .ret (.plus a b) => let rax := .reg .rax; [.movq (atom a) rax, .addq (atom b) rax, .jmp "fini"]
+| .ret (.minus a b) => let rax := .reg .rax; [.movq (atom a) rax, .subq (atom b) rax, .jmp "fini"]
+| .ret (.negative a) => let rax := .reg .rax; [.movq (atom a) rax, .negq rax, .jmp "fini"]
+| .ret (.atom a) => [.movq (atom a) (.reg .rax), .jmp "fini"]
 
 def x86_Var.select_instructions.block (c_instrs : C_Var.Tail) : Block := .block { live_before := none } $ tail c_instrs
 

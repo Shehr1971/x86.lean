@@ -24,7 +24,7 @@ where
   <$> x86_Int.Program.patch_instructions
   <$> (x86_Var.Program.assign_homes
       $ x86_Var.from_C_Var
-      $ (fun tail => C_Var.Program.mk [(.label "start", tail)])
+      $ (fun tail => C_Var.Program.mk [("start", tail)])
       $ C_Var.explicate_control
       $ L_Var.remove_complex_operands expr)
   | .error _ _ => Option.none

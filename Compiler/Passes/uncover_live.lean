@@ -17,7 +17,7 @@ def x86_Var.Instr.read_set : Instr → List (Sym⊕ Reg)
 | .pushq s => Arg.location s
 | .retq => []
 -- special case until we have more control flow analysis
-| .jmp (.label "conclusion") => .inr <$> [.rax, .rsp]
+| .jmp "conclusion" => .inr <$> [.rax, .rsp]
 | .jmp _ => []
 
 def x86_Var.Instr.write_set : Instr → List (Sym⊕ Reg)
@@ -55,5 +55,5 @@ where update_live : List (List (Sym⊕ Reg)) → Instr →  List (List (Sym⊕ R
   .negq (.var (.quote "t")),
   .movq (.var (.quote "z")) (.reg .rax),
   .addq (.var (.quote "t")) (.reg .rax),
-  .jmp (.label "conclusion")
+  .jmp "conclusion"
   ]) with | .block info _ => info.live_before
