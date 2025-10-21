@@ -3,19 +3,19 @@ import Compiler.Passes.patch_instructions
 def x86_Int.Program.prelude_and_conclusion : Program → Program
 | .program info blocks => 
   let stack_bytes := (info.stack_space * 8) + ((info.stack_space * 8) % 16)
-  .program info (blocks ++ [(.label "main", prelude_blk stack_bytes)] ++  [(.label "fini", fini_blk stack_bytes)])
+  .program info (blocks.append [("main", prelude_blk stack_bytes), ("fini", fini_blk stack_bytes)])
 where 
   prelude_blk (stack_bytes : Nat) : Block := .block $ [
     .pushq (.reg .rbp),
     .movq (.reg .rsp) (.reg .rbp),
     .subq (.imm stack_bytes) (.reg .rsp),
-    .jmp (.label "start")
+    .jmp ("start")
   ]
   fini_blk (stack_bytes : Nat) : Block := .block $ [
     .addq (.imm stack_bytes) (.reg .rsp),
     .popq (.reg .rbp),
     .movq (.reg .rax) (.reg .rdi),
-    .callq (.label "write_int") 1,
+    .callq ("write_int") 1,
     .retq
   ]
 

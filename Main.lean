@@ -9,7 +9,7 @@ unsafe def main : IO Unit := do
     <$> x86_Int.Program.patch_instructions
     <$> (x86_Var.Program.assign_homes
         $ x86_Var.from_C_Var
-        $ (fun tail => C_Var.Program.mk [(.label "start", tail)])
+        $ (fun tail => C_Var.Program.mk [("start", tail)])
         $ C_Var.explicate_control
         $ L_Var.remove_complex_operands expr)
     | .error _ s => throw $ IO.Error.mkInvalidArgument 1 s!"Couldn't parse: {s}"
