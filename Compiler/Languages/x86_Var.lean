@@ -17,6 +17,9 @@ instance instToStringReg_x86_Var : ToString x86_Var.Arg where
   | .deref reg int => s!"{int}({reg})"
   | .var s => s!"{s}"
 
+instance x86_Var.coeRegToArg : Coe Reg Arg where
+  coe r := .reg r
+
 inductive x86_Var.Instr
 | addq: Arg → Arg → Instr
 | subq: Arg → Arg → Instr

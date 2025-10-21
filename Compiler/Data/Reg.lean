@@ -21,3 +21,6 @@ instance instToStringLabel_x86_Reg : ToString Reg where
   | .r13 => "%r13"
   | .r14 => "%r14"
   | .r15 => "%r15"
+
+macro:max "%" ident:ident : term => do
+  pure $ Lean.mkIdent $ Lean.Name.mkStr `Reg ident.getId.toString

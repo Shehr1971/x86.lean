@@ -14,6 +14,12 @@ instance : ToString x86_Int.Arg where
   | .reg x => toString x
   | .deref reg int => s!"{int}({reg})"
 
+instance x86_Int.coeRegToArg : Coe Reg Arg where
+  coe r := .reg r
+
+instance x86_Int.coeNatToArg : Coe Nat Arg where
+  coe i := .imm i
+
 inductive x86_Int.Instr
 | addq: Arg → Arg → Instr
 | subq: Arg → Arg → Instr

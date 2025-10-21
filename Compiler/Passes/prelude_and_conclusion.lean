@@ -5,17 +5,17 @@ def x86_Int.Program.prelude_and_conclusion : Program → Program
   let stack_bytes := (info.stack_space * 8) + ((info.stack_space * 8) % 16)
   .program info (blocks.append [("main", prelude_blk stack_bytes), ("fini", fini_blk stack_bytes)])
 where 
-  prelude_blk (stack_bytes : Nat) : Block := .block $ [
-    .pushq (.reg .rbp),
-    .movq (.reg .rsp) (.reg .rbp),
-    .subq (.imm stack_bytes) (.reg .rsp),
-    .jmp ("start")
+  prelude_blk (stack_bytes : Nat) : Block := .block [
+    .pushq %rbp,
+    .movq %rsp %rbp,
+    .subq stack_bytes %rsp,
+    .jmp "start"
   ]
-  fini_blk (stack_bytes : Nat) : Block := .block $ [
-    .addq (.imm stack_bytes) (.reg .rsp),
-    .popq (.reg .rbp),
-    .movq (.reg .rax) (.reg .rdi),
-    .callq ("write_int") 1,
+  fini_blk (stack_bytes : Nat) : Block := .block [
+    .addq stack_bytes %rsp,
+    .popq %rbp,
+    .movq %rax %rdi,
+    .callq "write_int" 1,
     .retq
   ]
 

@@ -17,3 +17,7 @@ instance : LawfulBEq Sym where
 instance : ToString Sym where
   toString : Sym → String
   | .quote x => s!"'{x}"
+
+-- Define the macro that transforms 'ident into .symbol "ident"
+macro:max "," ident:ident : term =>
+  `(Sym.quote $(Lean.Syntax.mkStrLit ident.getId.toString))
