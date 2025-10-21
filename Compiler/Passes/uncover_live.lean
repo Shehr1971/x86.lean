@@ -39,9 +39,27 @@ def x86_Var.uncover_live : Block → Block
 -- update_live computes the live_before set of a given instruction, using the
 -- live_before sets of the subsequent instructions (which come earlier in the
 -- reversed list).
-where update_live : List (List (Sym⊕ Reg)) → Instr →  List (List (Sym⊕ Reg)) 
+where update_live : List (List (Sym⊕ Reg)) → Instr → List (List (Sym⊕ Reg)) 
 | [], instr => [instr.read_set]
 | acc@(x::_), instr => (x.filter (fun loc => ¬(instr.write_set.elem loc)) ++ instr.read_set)::acc
+
+/-- compute interference takes an instruction and its live-after set, and
+    returns a list of edges representing the interference between locations 
+    implied by their interactions -/
+def x86_Var.compute_interference : Instr → List (Sym⊕ Reg) → List ((Sym⊕ Reg) × (Sym⊕ Reg))
+| .movq s d@(.reg r), locs => (locs.filter fun loc => toArg loc != d && toArg loc != s).map fun loc => (loc, .inr r)
+| .movq s d@(.var v), locs => (locs.filter fun loc => toArg loc != d && toArg loc != s).map fun loc => (loc, .inl v)
+| .movq _ _, _=> []
+| i, locs => -- yuck, should be monadic
+    (i.write_set.map fun iwrite => ((locs.filter fun loc => loc != iwrite).map fun loc => (loc, iwrite))).flatten
+where toArg : Sym⊕ Reg → Arg
+| .inl v => .var v
+| .inr r => .reg r
+
+def x86_Var.interference_for_block : Block → List ((Sym⊕ Reg) × (Sym⊕ Reg))
+| .block info instrs => match info.live_before with
+  | .some lb => (((lb.drop 1).zip instrs).map fun (locs, instr) => compute_interference instr locs).flatten
+  | .none => []
 
 #eval match (x86_Var.uncover_live $ .block { live_before := .none } [
   .movq (.imm 1) (.var (.quote "v")),
@@ -57,3 +75,19 @@ where update_live : List (List (Sym⊕ Reg)) → Instr →  List (List (Sym⊕ R
   .addq (.var (.quote "t")) (.reg .rax),
   .jmp "conclusion"
   ]) with | .block info _ => info.live_before
+
+#eval x86_Var.interference_for_block $
+  (x86_Var.uncover_live $ .block { live_before := .none } [
+  .movq (.imm 1) (.var (.quote "v")),
+  .movq (.imm 42) (.var (.quote "w")),
+  .movq (.var (.quote "v")) (.var (.quote "x")),
+  .addq (.imm 7) (.var (.quote "x")),
+  .movq (.var (.quote "x")) (.var (.quote "y")),
+  .movq (.var (.quote "x")) (.var (.quote "z")),
+  .addq (.var (.quote "w")) (.var (.quote "z")),
+  .movq (.var (.quote "y")) (.var (.quote "t")),
+  .negq (.var (.quote "t")),
+  .movq (.var (.quote "z")) (.reg .rax),
+  .addq (.var (.quote "t")) (.reg .rax),
+  .jmp "conclusion"
+  ]) 

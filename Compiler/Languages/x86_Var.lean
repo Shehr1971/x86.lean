@@ -8,6 +8,7 @@ inductive x86_Var.Arg
 | reg : Reg → Arg
 | deref : Reg → Int → Arg
 | var : Sym → Arg
+deriving BEq
 
 instance instToStringReg_x86_Var : ToString x86_Var.Arg where
   toString : x86_Var.Arg → String
