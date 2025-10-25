@@ -20,6 +20,18 @@ instance instToStringReg_x86_Var : ToString x86_Var.Arg where
 instance x86_Var.coeRegToArg : Coe Reg Arg where
   coe r := .reg r
 
+instance x86_Var.coeSymToArg : Coe Sym Arg where
+  coe s := .var s
+
+instance x86_Var.natToArg (n : Nat) : OfNat Arg n where
+  ofNat := .imm n
+
+def x86_Var.Arg.toVar : Arg → List Sym
+| .imm _ => []
+| .reg _ => []
+| .var v => [v]
+| .deref _ _ => []
+
 inductive x86_Var.Instr
 | addq: Arg → Arg → Instr
 | subq: Arg → Arg → Instr
@@ -30,6 +42,15 @@ inductive x86_Var.Instr
 | callq: Label → Nat → Instr -- Nat indicates arity of function
 | retq: Instr 
 | jmp: Label → Instr
+
+def x86_Var.Instr.toVars : Instr → List Sym
+| .addq x y => x.toVar ++ y.toVar
+| .subq x y => x.toVar ++ y.toVar
+| .negq x => x.toVar
+| .pushq x => x.toVar
+| .popq x => x.toVar
+| .movq x y => x.toVar ++ y.toVar
+| _ => []
 
 instance instToStringInstr_x86_Var : ToString x86_Var.Instr where
   toString : x86_Var.Instr → String
@@ -49,14 +70,18 @@ structure x86_Var.BInfo where
 inductive x86_Var.Block
 | block: BInfo → List Instr → Block
 
+def x86_Var.Block.toVars : Block → List Sym
+| .block _ instrs => (instrs.map fun i => i.toVars).flatten
+
 instance instToStringBlock_x86_Var : ToString x86_Var.Block where
   toString : x86_Var.Block → String
   | .block _ instrs => String.join 
   $ instrs.map $ fun instr => s!"\t{toString instr}\n"
 
 structure x86_Var.PInfo where
+  conflicts: Option (List ((Sym⊕ Reg)×(Sym⊕ Reg)))
   locals_types : Lean.AssocList Sym Sym
-  stack_space : Nat
+  stack_space : Option Nat
 
 inductive x86_Var.Program
 | program: PInfo → List (Label × Block) → Program

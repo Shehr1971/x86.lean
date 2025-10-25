@@ -8,6 +8,8 @@ unsafe def main : IO Unit := do
     | .success _ expr => pure $ x86_Int.Program.prelude_and_conclusion
     <$> x86_Int.Program.patch_instructions
     <$> (x86_Var.Program.assign_homes
+        $ x86_Var.Program.build_interference
+        $ x86_Var.Program.uncover_live
         $ x86_Var.from_C_Var
         $ (fun tail => C_Var.Program.mk [("start", tail)])
         $ C_Var.explicate_control

@@ -39,6 +39,7 @@ def x86_Var.select_instructions.block (c_instrs : C_Var.Tail) : Block := .block 
 def x86_Var.from_C_Var : C_Var.Program → Program
 | .program info tails => .program 
     { 
+      conflicts := .none
       locals_types := info.locals_types,
       stack_space := List.length 
         $ info.locals_types.toList.foldl 
